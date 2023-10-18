@@ -118,20 +118,23 @@ func (j *Jenkins) CreateNode(ctx context.Context, name string, numExecutors int,
 	}
 
 	method := params["method"]
-	var launcher map[string]string
+	var launcher map[string]interface{}
 	switch method {
 	case "":
 		fallthrough
 	case "JNLPLauncher":
-		launcher = map[string]string{"stapler-class": "hudson.slaves.JNLPLauncher"}
+		launcher = map[string]interface{}{"stapler-class": "hudson.slaves.JNLPLauncher"}
 	case "SSHLauncher":
-		launcher = map[string]string{
-			"stapler-class":        "hudson.plugins.sshslaves.SSHLauncher",
-			"$class":               "hudson.plugins.sshslaves.SSHLauncher",
-			"host":                 params["host"],
-			"port":                 params["port"],
-			"credentialsId":        params["credentialsId"],
-			"sshHostKeyVerificationStrategy":        params["sshHostKeyVerificationStrategy"],
+		launcher = map[string]interface{}{
+			"stapler-class": "hudson.plugins.sshslaves.SSHLauncher",
+			"$class":        "hudson.plugins.sshslaves.SSHLauncher",
+			"host":          params["host"],
+			"port":          params["port"],
+			"credentialsId": params["credentialsId"],
+			"sshHostKeyVerificationStrategy": map[string]string{
+				"stapler-class": "hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy",
+				"$class":        "hudson.plugins.sshslaves.verifiers.NonVerifyingKeyVerificationStrategy",
+			},
 			"jvmOptions":           params["jvmOptions"],
 			"javaPath":             params["javaPath"],
 			"prefixStartSlaveCmd":  params["prefixStartSlaveCmd"],
